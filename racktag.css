@@ -376,4 +376,26 @@ body {
         font-size: 1rem;
         margin: 0;
     }
+
+    /* =========================================================
+       CRITICAL PRINT CORE RESETS (Forces QR Engine Compliance)
+       ========================================================= */
+    #qr-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        background: #fff !important;
+    }
+
+    /* Target BOTH generated canvas configurations and standard image tags */
+    #qr-container canvas,
+    #qr-container img {
+        display: block !important;
+        width: 100% !important;   /* Stretches graphic to fill layout dimensions */
+        height: 100% !important;  /* Maintains perfect proportion filling */
+        max-width: none !important;
+        max-height: none !important;
+        object-fit: contain !important;
+    }
 }
