@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RackTag by APES</title>
+
+    <!-- Manifest for PWA (offline support) -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- RackTag Styles -->
+    <link rel="stylesheet" href="racktag.css">
+</head>
+<body>
+
+    <!-- QR library -->
+    <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.js"></script>
+
+    <div id="app">
+
+        <!-- HEADER -->
+        <header class="rt-header">
+            <h1>RackTag by APES</h1>
+            <p class="rt-motto">If a warehouse guy has to think, we failed.</p>
+        </header>
+
+        <!-- SCREEN 1: HOME -->
+        <section id="screen-home" class="rt-screen active">
+            <button class="rt-btn pick-btn" data-target="warehouse">
+                Warehouse: <span id="sel-warehouse"></span>
+            </button>
+
+            <button class="rt-btn pick-btn" data-target="floor">
+                Floor/Road: <span id="sel-floor"></span>
+            </button>
+
+            <button class="rt-btn pick-btn" data-target="section">
+                Section: <span id="sel-section"></span>
+            </button>
+
+            <button class="rt-btn pick-btn" data-target="subsection">
+                Subsection: <span id="sel-subsection"></span>
+            </button>
+
+            <!-- Label size selector -->
+            <label class="rt-label-size">
+                Label size:
+                <select id="label-size">
+                    <option value="4x2" selected>Thermal – 4in W x 2in H</option>
+                    <option value="4x6">Thermal – 4in W x 6in H</option>
+                    <option value="letter">Regular Paper (Letter)</option>
+                </select>
+            </label>
+
+            <button id="btn-generate" class="rt-btn primary" disabled>
+                GENERATE LABEL
+            </button>
+
+            <div id="loading-msg" style="display:none; text-align:center; color:#666;">Loading location data…</div>
+        </section>
+
+        <!-- SCREEN 2: SELECTOR -->
+        <section id="screen-selector" class="rt-screen">
+            <h2 id="selector-title"></h2>
+            <div id="selector-grid"></div>
+
+            <button id="selector-back" class="rt-btn secondary">BACK</button>
+        </section>
+
+        <!-- SCREEN 3: PREVIEW -->
+        <section id="screen-preview" class="rt-screen">
+            <!-- Dynamic label container -->
+            <div id="label">
+                <!-- QR Code -->
+                <div id="qr-container"></div>
+                
+                <!-- Text block (wrapped so CSS can lay it side‑by‑side for 4x2) -->
+                <div class="label-text-group">
+                    <h3 id="shelf-id"></h3>
+                    <p id="location-string"></p>
+                </div>
+            </div>
+
+            <!-- Button row with an ID so we can hide it during print -->
+            <div id="action-buttons" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:20px;">
+                <button id="btn-print" class="rt-btn primary" style="flex:1;">PRINT LABEL</button>
+                <button id="btn-download" class="rt-btn secondary" style="flex:1;">DOWNLOAD PNG</button>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: CONFIRMATION -->
+        <section id="screen-confirm" class="rt-screen">
+            <p class="rt-confirm-msg">Label sent to printer.</p>
+
+            <button id="btn-new" class="rt-btn primary">NEW LABEL</button>
+            <button id="btn-reprint" class="rt-btn secondary">REPRINT</button>
+        </section>
+
+    </div>
+
+    <!-- RackTag Logic -->
+    <script src="racktag.js"></script>
+
+    <!-- Register Service Worker for offline -->
+    <script>
+        if ('serviceWorker' in navigator && ['http:', 'https:'].includes(window.location.protocol)) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('SW registered'))
+                .catch(err => console.warn('SW registration failed:', err));
+        }
+    </script>
+
+</body>
+</html>

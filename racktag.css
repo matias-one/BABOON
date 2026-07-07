@@ -1,0 +1,379 @@
+/* --------------------------------------------------
+   RACKTAG BASE STYLES
+-------------------------------------------------- */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f1f5f9;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* --------------------------------------------------
+   HEADER
+-------------------------------------------------- */
+
+.rt-header {
+    background: #2F4F2F;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.rt-header h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.rt-motto {
+    margin: 6px 0 0;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* --------------------------------------------------
+   SCREENS
+-------------------------------------------------- */
+
+.rt-screen {
+    display: none;
+    padding: 20px;
+}
+
+.rt-screen.active {
+    display: block;
+}
+
+/* --------------------------------------------------
+   BUTTONS
+-------------------------------------------------- */
+
+.rt-btn {
+    width: 100%;
+    padding: 22px;
+    margin: 12px 0;
+    font-size: 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: white;
+    color: #2F4F2F;
+    border: 2px solid #cbd5e1;
+    transition: 0.1s ease;
+}
+
+.rt-btn:active {
+    transform: scale(0.97);
+}
+.rt-btn:disabled {
+    opacity: 0.5;
+    transform: none;
+    cursor: not-allowed;
+}
+
+.primary {
+    background: #1aa360;
+    color: white;
+    border: none;
+}
+
+.secondary {
+    background: #2F4F2F;
+    color: white;
+    border: none;
+}
+
+/* --------------------------------------------------
+   SELECTOR GRID
+-------------------------------------------------- */
+
+#selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+}
+
+.selector-item {
+    background: white;
+    padding: 16px;
+    text-align: center;
+    font-size: 20px;
+    border-radius: 10px;
+    border: 2px solid #cbd5e1;
+    cursor: pointer;
+    transition: 0.1s ease;
+}
+
+.selector-item:active {
+    transform: scale(0.95);
+}
+
+/* --------------------------------------------------
+   PREVIEW SCREEN (NON-PRINT MODE)
+-------------------------------------------------- */
+
+/* In preview mode: QR and text stack vertically */
+#label {
+    width: 100%;
+    max-width: 4in;
+    margin: 0 auto;
+    padding: 0.2in;
+    box-sizing: border-box;
+    background: white;
+    border-radius: 6px;
+    border: 2px solid #cbd5e1;
+    
+    /* Default to column layout for preview (looks good on phone) */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15in;
+}
+
+/* The text group is just a block in preview mode */
+.label-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+#qr-container {
+    margin: 10px auto;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1/1;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#qr-container canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+#shelf-id {
+    font-size: 28px;
+    text-align: center;
+    margin: 0 0 5px 0;
+    color: #2F4F2F;
+}
+
+#location-string {
+    text-align: center;
+    font-size: 16px;
+    color: #475569;
+    margin: 0;
+}
+
+/* --------------------------------------------------
+   FONT SCALING (Preview only, print overrides below)
+-------------------------------------------------- */
+
+.label-small { font-size: 0.55rem; }
+.label-medium { font-size: 0.85rem; }
+.label-large { font-size: 1.15rem; }
+
+#label h3 { margin: 0; }
+#label p { margin: 0; }
+
+/* --------------------------------------------------
+   PRINT MODE – THE REAL FIX IS HERE
+-------------------------------------------------- */
+
+@media print {
+    /* 1. HIDE THE HEADER (it was printing on its own page!) */
+    header.rt-header {
+        display: none !important;
+    }
+
+    /* 2. HIDE THE BUTTON ROW (we gave it an ID) */
+    #action-buttons {
+        display: none !important;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+
+    #app {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    /* Hide all UI screens except preview */
+    #screen-home,
+    #screen-selector,
+    #screen-confirm {
+        display: none !important;
+    }
+
+    #screen-preview {
+        display: block !important;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* ---- LABEL STYLES FOR 4x2 (WIDE) ---- */
+    body.page-4x2 #label {
+        /* Side-by-side layout: QR left, Text right */
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: space-evenly;
+        
+        width: 4in;
+        height: 2in;
+        max-width: none;
+        padding: 0.1in;
+        border: none;
+        border-radius: 0;
+        gap: 0.05in;
+        
+        margin: 0 auto;
+        page-break-inside: avoid;
+        box-sizing: border-box;
+    }
+
+    body.page-4x2 #qr-container {
+        /* QR takes 45% of the width, full height */
+        width: 45%;
+        height: 90%;
+        max-width: none;
+        aspect-ratio: unset;
+        border: 1px solid #ddd; /* subtle border for visibility */
+        border-radius: 4px;
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    body.page-4x2 .label-text-group {
+        /* Text takes 45% of the width, centered */
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        gap: 2px;
+    }
+
+    body.page-4x2 #shelf-id {
+        font-size: 0.65rem; /* Small font to fit 2-inch height */
+        font-weight: bold;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    body.page-4x2 #location-string {
+        font-size: 0.4rem;
+        margin: 0;
+        line-height: 1.2;
+        color: #333;
+    }
+
+    /* ---- LABEL STYLES FOR 4x6 (TALL) ---- */
+    body.page-4x6 #label {
+        flex-direction: column !important;
+        align-items: center;
+        justify-content: center;
+        
+        width: 4in;
+        height: 6in;
+        max-width: none;
+        padding: 0.2in;
+        border: none;
+        border-radius: 0;
+        gap: 0.1in;
+        
+        margin: 0 auto;
+        page-break-inside: avoid;
+        box-sizing: border-box;
+    }
+
+    body.page-4x6 #qr-container {
+        width: 70%;
+        height: auto;
+        max-width: none;
+        aspect-ratio: 1/1;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 0;
+    }
+
+    body.page-4x6 .label-text-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    body.page-4x6 #shelf-id {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    body.page-4x6 #location-string {
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    /* ---- LABEL STYLES FOR REGULAR LETTER PAPER ---- */
+    body.page-letter #label {
+        flex-direction: column !important;
+        align-items: center;
+        justify-content: center;
+        
+        width: 4in;
+        height: 6in; /* Simulate a 4x6 label centered on Letter */
+        max-width: none;
+        padding: 0.3in;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        gap: 0.1in;
+        
+        margin: 1in auto;
+        page-break-inside: avoid;
+        box-sizing: border-box;
+    }
+
+    body.page-letter #qr-container {
+        width: 70%;
+        height: auto;
+        aspect-ratio: 1/1;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 0;
+    }
+
+    body.page-letter .label-text-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    body.page-letter #shelf-id {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    body.page-letter #location-string {
+        font-size: 1rem;
+        margin: 0;
+    }
+}
