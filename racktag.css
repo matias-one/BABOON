@@ -194,13 +194,12 @@ body {
 -------------------------------------------------- */
 
 @media print {
-    /* 1. HIDE THE HEADER (it was printing on its own page!) */
-    header.rt-header {
-        display: none !important;
-    }
-
-    /* 2. HIDE THE BUTTON ROW (we gave it an ID) */
-    #action-buttons {
+    /* 1. HIDE ALL WEB UI UI ELEMENTS */
+    header.rt-header,
+    #action-buttons,
+    #screen-home,
+    #screen-selector,
+    #screen-confirm {
         display: none !important;
     }
 
@@ -210,192 +209,109 @@ body {
         background: white;
     }
 
-    #app {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-    }
-
-    /* Hide all UI screens except preview */
-    #screen-home,
-    #screen-selector,
-    #screen-confirm {
-        display: none !important;
-    }
-
     #screen-preview {
         display: block !important;
         padding: 0;
         margin: 0;
     }
 
-    /* ---- LABEL STYLES FOR 4x2 (WIDE) ---- */
+    /* =========================================================
+       LAYOUT 1: THERMAL 4x2 (Force Wide Horizontal Aspect)
+       ========================================================= */
     body.page-4x2 #label {
-        /* Side-by-side layout: QR left, Text right */
-        flex-direction: row !important;
-        align-items: center;
-        justify-content: space-evenly;
+        display: flex !important;
+        flex-direction: row !important; /* QR left, Text right */
+        align-items: center !important;
+        justify-content: space-between !important;
         
-        width: 4in;
-        height: 2in;
-        max-width: none;
-        padding: 0.1in;
-        border: none;
-        border-radius: 0;
-        gap: 0.05in;
-        
-        margin: 0 auto;
-        page-break-inside: avoid;
-        box-sizing: border-box;
+        width: 4in !important;
+        height: 2in !important;
+        max-width: none !important;
+        padding: 0.1in !important;
+        box-sizing: border-box !important;
     }
 
     body.page-4x2 #qr-container {
-        /* QR takes 45% of the width, full height */
-        width: 45%;
-        height: 90%;
-        max-width: none;
-        aspect-ratio: unset;
-        border: 1px solid #ddd; /* subtle border for visibility */
-        border-radius: 4px;
-        margin: 0;
-        flex-shrink: 0;
+        width: 1.8in !important;
+        height: 1.8in !important;
+        max-width: none !important;
+        margin: 0 !important;
+        border: none !important;
     }
 
     body.page-4x2 .label-text-group {
-        /* Text takes 45% of the width, centered */
-        width: 45%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        gap: 2px;
+        width: 2.0in !important;
+        text-align: center !important;
     }
 
     body.page-4x2 #shelf-id {
-        font-size: 0.65rem; /* Small font to fit 2-inch height */
-        font-weight: bold;
-        margin: 0;
-        line-height: 1.2;
+        font-size: 20pt !important;
+        font-weight: bold !important;
     }
 
     body.page-4x2 #location-string {
-        font-size: 0.4rem;
-        margin: 0;
-        line-height: 1.2;
-        color: #333;
-    }
-
-    /* ---- LABEL STYLES FOR 4x6 (TALL) ---- */
-    body.page-4x6 #label {
-        flex-direction: column !important;
-        align-items: center;
-        justify-content: center;
-        
-        width: 4in;
-        height: 6in;
-        max-width: none;
-        padding: 0.2in;
-        border: none;
-        border-radius: 0;
-        gap: 0.1in;
-        
-        margin: 0 auto;
-        page-break-inside: avoid;
-        box-sizing: border-box;
-    }
-
-    body.page-4x6 #qr-container {
-        width: 70%;
-        height: auto;
-        max-width: none;
-        aspect-ratio: 1/1;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        margin: 0;
-    }
-
-    body.page-4x6 .label-text-group {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    body.page-4x6 #shelf-id {
-        font-size: 1.2rem;
-        margin: 0;
-    }
-    body.page-4x6 #location-string {
-        font-size: 0.8rem;
-        margin: 0;
-    }
-
-    /* ---- LABEL STYLES FOR REGULAR LETTER PAPER ---- */
-    body.page-letter #label {
-        flex-direction: column !important;
-        align-items: center;
-        justify-content: center;
-        
-        width: 4in;
-        height: 6in; /* Simulate a 4x6 label centered on Letter */
-        max-width: none;
-        padding: 0.3in;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        gap: 0.1in;
-        
-        margin: 1in auto;
-        page-break-inside: avoid;
-        box-sizing: border-box;
-    }
-
-    body.page-letter #qr-container {
-        width: 70%;
-        height: auto;
-        aspect-ratio: 1/1;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        margin: 0;
-    }
-
-    body.page-letter .label-text-group {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    body.page-letter #shelf-id {
-        font-size: 1.5rem;
-        margin: 0;
-    }
-    body.page-letter #location-string {
-        font-size: 1rem;
-        margin: 0;
+        font-size: 11pt !important;
     }
 
     /* =========================================================
-       CRITICAL PRINT CORE RESETS (Forces QR Engine Compliance)
+       LAYOUT 2: REGULAR LETTER PAPER (Full Page Scale Up)
+       ========================================================= */
+    body.page-letter #label {
+        display: flex !important;
+        flex-direction: column !important; /* QR top, Text bottom */
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5in !important;
+        
+        /* Take up almost the full printable area of an A4/Letter page */
+        width: 7.5in !important;
+        height: 9.5in !important;
+        max-width: none !important;
+        margin: 0.5in auto !important;
+        padding: 0.5in !important;
+        box-sizing: border-box !important;
+        border: none !important;
+    }
+
+    body.page-letter #qr-container {
+        /* Scale the QR container up significantly on normal paper */
+        width: 5.0in !important;
+        height: 5.0in !important;
+        max-width: none !important;
+        margin: 0 auto !important;
+        border: none !important;
+    }
+
+    body.page-letter .label-text-group {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    body.page-letter #shelf-id {
+        font-size: 42pt !important; /* Huge, readable text from across the aisle */
+        font-weight: bold !important;
+        margin-bottom: 10px !important;
+    }
+
+    body.page-letter #location-string {
+        font-size: 22pt !important;
+    }
+
+    /* =========================================================
+       CORE RESETS: Forces the Canvas/Img graphics to stretch
        ========================================================= */
     #qr-container {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        overflow: hidden !important;
-        background: #fff !important;
+        background: white !important;
     }
 
-    /* Target BOTH generated canvas configurations and standard image tags */
     #qr-container canvas,
     #qr-container img {
         display: block !important;
-        width: 100% !important;   /* Stretches graphic to fill layout dimensions */
-        height: 100% !important;  /* Maintains perfect proportion filling */
-        max-width: none !important;
-        max-height: none !important;
+        width: 100% !important;
+        height: 100% !important;
         object-fit: contain !important;
     }
 }
