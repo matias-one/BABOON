@@ -263,8 +263,9 @@ function renderQrCode(container, text, pixelSize) {
 document.getElementById('btn-generate').addEventListener('click', () => {
     console.log('🟢 GENERATE button clicked!');
 
-    if (!state.warehouse || !state.floor || !state.section || !state.subsection) {
-        alert('Please select all location fields.');
+    // Validate again - only Warehouse and Floor are mandatory
+    if (!state.warehouse || !state.floor) {
+        alert('Please select at least Warehouse and Floor.');
         return;
     }
 
