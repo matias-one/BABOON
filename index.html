@@ -10,6 +10,15 @@
 
     <!-- RackTag Styles -->
     <link rel="stylesheet" href="racktag.css">
+
+    <style>
+@media print {
+    #action-buttons { display: none !important; }
+    body { margin: 0; padding: 0; }
+    #label { page-break-inside: avoid; }
+}
+</style>
+
 </head>
 <body>
 
@@ -102,13 +111,14 @@
     <script src="racktag.js"></script>
 
     <!-- Register Service Worker for offline -->
-    <script>
-        if ('serviceWorker' in navigator && ['http:', 'https:'].includes(window.location.protocol)) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('SW registered'))
-                .catch(err => console.warn('SW registration failed:', err));
-        }
-    </script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('SW registered'))
+        .catch(err => console.warn('SW registration failed:', err));
+}
+</script>
+
 
 </body>
 </html>

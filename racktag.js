@@ -10,11 +10,9 @@ async function loadLocations() {
     loadingMsg.style.display = 'block';
 
     try {
-        // Try to fetch from network
         const response = await fetch('data/locations.json');
         if (!response.ok) throw new Error('Network response not ok');
         locations = await response.json();
-        // Store in localStorage for offline fallback
         localStorage.setItem('locations_cache', JSON.stringify(locations));
         console.log('✅ Locations loaded from network');
     } catch (err) {
@@ -65,7 +63,6 @@ document.getElementById('label-size').value = state.labelSize;
 
 /* --------------------------------------------------
    LABEL SIZE CONFIG
-   (three supported sizes: two thermal + regular paper)
 -------------------------------------------------- */
 
 const LABEL_SIZES = {
@@ -89,10 +86,6 @@ const LABEL_SIZES = {
     }
 };
 
-/* Injects/updates a <style> tag with the correct @page rule.
-   This MUST be done in JS because @page cannot be scoped to a
-   class selector in plain CSS (e.g. "body.page-4x6 { @page {...} } "
-   is invalid and browsers silently ignore it). */
 function setPageSize(size) {
     const cfg = LABEL_SIZES[size] || LABEL_SIZES['4x2'];
 
@@ -210,10 +203,8 @@ function updateGenerateButton() {
     console.log('🔘 Generate button enabled:', allFilled);
 }
 
-// Initial update
 updateGenerateButton();
 
-// Also update when label size changes
 document.getElementById('label-size').addEventListener('change', (e) => {
     state.labelSize = e.target.value;
     saveState();
@@ -221,12 +212,14 @@ document.getElementById('label-size').addEventListener('change', (e) => {
 });
 
 /* --------------------------------------------------
-   GENERATE LABEL (QR + dynamic size) - WITH DEBUG LOGS
+   GENERATE LABEL (QR + dynamic size)
 -------------------------------------------------- */
 
 function renderQrCode(container, text) {
     container.innerHTML = '';
-    const size = 300;
+
+    // Bigger QR to survive print scaling
+    const size = 400;
 
     if (typeof window.QRCode === 'function') {
         try {
@@ -236,12 +229,19 @@ function renderQrCode(container, text) {
                 height: size,
                 correctLevel: window.QRCode.CorrectLevel.H
             });
+
+            const canvas = container.querySelector('canvas');
+            if (canvas) {
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+            }
             return;
         } catch (qrError) {
             console.warn('⚠️ QR library failed, using fallback preview:', qrError);
         }
     }
 
+    // Fallback preview (not scannable, just visual)
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -274,7 +274,6 @@ function renderQrCode(container, text) {
 document.getElementById('btn-generate').addEventListener('click', () => {
     console.log('🟢 GENERATE button clicked!');
 
-    // Validate again
     if (!state.warehouse || !state.floor || !state.section || !state.subsection) {
         alert('Please select all location fields.');
         return;
@@ -287,26 +286,20 @@ document.getElementById('btn-generate').addEventListener('click', () => {
     document.getElementById('location-string').innerText =
         `${state.warehouse} / ${state.floor} / ${state.section} / ${state.subsection}`;
 
-    // Set label sizing/scaling based on size using the config table
     const size = state.labelSize;
     const cfg = LABEL_SIZES[size] || LABEL_SIZES['4x2'];
     const label = document.getElementById('label');
 
-    // For preview, keep a reasonable max-width; actual print size is handled by @page
     label.style.maxWidth = cfg.previewMaxWidth;
 
-    // Adjust font scaling
     label.classList.remove('label-small', 'label-medium', 'label-large');
     label.classList.add(cfg.fontClass);
 
-    // Generate QR
     const qrBox = document.getElementById('qr-container');
     renderQrCode(qrBox, shelfID);
 
-    // Set the actual @page size for printing (also sets body class)
     setPageSize(size);
 
-    // Show preview screen
     showScreen('preview');
     console.log('👀 Preview screen should be visible now');
 });
@@ -333,7 +326,6 @@ document.getElementById('btn-download').addEventListener('click', () => {
         return;
     }
 
-    // Create a new canvas at 300 DPI, sized to match the chosen paper/label size
     const PNG_DPI = 300;
     const PNG_DIMENSIONS_IN = {
         '4x2': { w: 4, h: 2 },
@@ -351,18 +343,15 @@ document.getElementById('btn-download').addEventListener('click', () => {
     canvas.height = heightPx;
     const ctx = canvas.getContext('2d');
 
-    // White background
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, widthPx, heightPx);
 
-    // Draw QR code scaled
     const qrScale = isLetter ? 0.35 : 0.6;
     const qrSize = Math.min(widthPx, heightPx) * qrScale;
     const qrX = (widthPx - qrSize) / 2;
     const qrY = (heightPx - qrSize) / 2 - (is4x6 || isLetter ? 50 : 0);
     ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
 
-    // Draw text
     ctx.fillStyle = '#2F4F2F';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
@@ -376,7 +365,6 @@ document.getElementById('btn-download').addEventListener('click', () => {
     ctx.font = `${fontSize * 0.5}px system-ui, sans-serif`;
     ctx.fillText(locationStr, widthPx / 2, qrY + qrSize + 20 + fontSize + 10);
 
-    // Download
     const link = document.createElement('a');
     link.download = `${shelfID}.png`;
     link.href = canvas.toDataURL('image/png');

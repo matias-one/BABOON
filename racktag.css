@@ -315,3 +315,32 @@ body {
         object-fit: contain !important;
     }
 }
+
+@media print {
+    #qr-container canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+}
+
+#qr-container {
+    width: 2in;
+    height: 2in;
+}
+
+#qr-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+@page {
+    margin: 0;
+}
+
+@media print {
+    body {
+        zoom: 1 !important;
+        transform: none !important;
+    }
+}
