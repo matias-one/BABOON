@@ -204,7 +204,8 @@ document.getElementById('selector-back').addEventListener('click', () => {
 
 function updateGenerateButton() {
     const btn = document.getElementById('btn-generate');
-    const allFilled = state.warehouse && state.floor && state.section && state.subsection;
+    // Only Warehouse and Floor are mandatory now
+    const allFilled = state.warehouse && state.floor;
     btn.disabled = !allFilled;
     console.log('🔘 Generate button enabled:', allFilled);
 }
@@ -267,10 +268,13 @@ document.getElementById('btn-generate').addEventListener('click', () => {
 
     console.log('✅ All fields are filled');
 
-    const shelfID = `${state.warehouse}-${state.floor}-${state.section}-${state.subsection}`;
+    // Build the ID using only the fields that have values
+    const parts = [state.warehouse, state.floor, state.section, state.subsection].filter(p => p && p.trim() !== '');
+    const shelfID = parts.join('-');
+    const locationString = parts.join(' / ');
+    
     document.getElementById('shelf-id').innerText = shelfID;
-    document.getElementById('location-string').innerText =
-        `${state.warehouse} / ${state.floor} / ${state.section} / ${state.subsection}`;
+    document.getElementById('location-string').innerText = locationString;
 
     const size = state.labelSize;
     const cfg = LABEL_SIZES[size] || LABEL_SIZES['4x2'];
