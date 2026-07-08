@@ -344,3 +344,25 @@ body {
         transform: none !important;
     }
 }
+
+
+/* Force the QR container to size itself to the canvas, no scaling */
+#qr-container {
+    display: inline-block !important;  /* so it wraps the canvas */
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    border: none !important;
+    background: white !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+#qr-container canvas {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}

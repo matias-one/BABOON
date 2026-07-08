@@ -70,19 +70,25 @@ const LABEL_SIZES = {
         bodyClass: 'page-4x2',
         fontClass: 'label-small',
         pageCss: 'size: 4in 2in; margin: 0;',
-        previewMaxWidth: '4in'
+        previewMaxWidth: '4in',
+        qrSizePx: 600,      // high-res for print
+        qrSizePreviewPx: 300 // preview size
     },
     '4x6': {
         bodyClass: 'page-4x6',
         fontClass: 'label-medium',
         pageCss: 'size: 4in 6in; margin: 0;',
-        previewMaxWidth: '4in'
+        previewMaxWidth: '4in',
+        qrSizePx: 600,
+        qrSizePreviewPx: 300
     },
     'letter': {
         bodyClass: 'page-letter',
         fontClass: 'label-large',
         pageCss: 'size: letter; margin: 0;',
-        previewMaxWidth: '4in'
+        previewMaxWidth: '4in',
+        qrSizePx: 800,      // bigger for letter paper
+        qrSizePreviewPx: 400
     }
 };
 
@@ -212,63 +218,43 @@ document.getElementById('label-size').addEventListener('change', (e) => {
 });
 
 /* --------------------------------------------------
-   GENERATE LABEL (QR + dynamic size)
+   GENERATE LABEL – FIXED QR CODE
 -------------------------------------------------- */
 
-function renderQrCode(container, text) {
+function renderQrCode(container, text, pixelSize) {
     container.innerHTML = '';
 
-    // Bigger QR to survive print scaling
-    const size = 400;
-
-    if (typeof window.QRCode === 'function') {
-        try {
-            new window.QRCode(container, {
-                text,
-                width: size,
-                height: size,
-                correctLevel: window.QRCode.CorrectLevel.H
-            });
-
-            const canvas = container.querySelector('canvas');
-            if (canvas) {
-                canvas.style.width = '100%';
-                canvas.style.height = '100%';
-            }
-            return;
-        } catch (qrError) {
-            console.warn('⚠️ QR library failed, using fallback preview:', qrError);
-        }
+    // Use the global QRCode library
+    if (typeof QRCode === 'undefined') {
+        console.error('❌ QRCode library not loaded');
+        container.innerHTML = '<p style="color:red;">QR library missing</p>';
+        return;
     }
 
-    // Fallback preview (not scannable, just visual)
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
+    try {
+        // Generate QR with LOW error correction (fewer modules = larger cells)
+        new QRCode(container, {
+            text: text,
+            width: pixelSize,
+            height: pixelSize,
+            correctLevel: QRCode.CorrectLevel.L   // L = lowest error correction
+        });
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, size, size);
-
-    ctx.fillStyle = '#2F4F2F';
-    const cell = size / 9;
-    const seed = Array.from(text).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-
-    for (let row = 0; row < 9; row += 1) {
-        for (let col = 0; col < 9; col += 1) {
-            const shouldFill = ((row + col + seed) % 3 === 0) || ((row * 2 + col + seed) % 5 === 0);
-            if (shouldFill) {
-                ctx.fillRect(col * cell, row * cell, cell, cell);
-            }
+        // The library creates a canvas; we keep it as-is, no CSS scaling
+        const canvas = container.querySelector('canvas');
+        if (canvas) {
+            // Remove any inline styles that might cause scaling
+            canvas.style.width = '';
+            canvas.style.height = '';
+            // Ensure crisp edges on print
+            canvas.style.imageRendering = 'pixelated';
+            canvas.style.imageRendering = 'crisp-edges';
         }
+        console.log('✅ QR code generated (size:', pixelSize, 'px)');
+    } catch (err) {
+        console.error('❌ QR generation error:', err);
+        container.innerHTML = '<p style="color:red;">QR Error</p>';
     }
-
-    ctx.fillStyle = '#111827';
-    ctx.font = '16px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('QR preview', size / 2, size - 20);
-
-    container.appendChild(canvas);
 }
 
 document.getElementById('btn-generate').addEventListener('click', () => {
@@ -295,11 +281,20 @@ document.getElementById('btn-generate').addEventListener('click', () => {
     label.classList.remove('label-small', 'label-medium', 'label-large');
     label.classList.add(cfg.fontClass);
 
+    // Choose QR pixel size: larger for print, smaller for preview
+    // We'll always use the high-res size for both, but preview container will clamp it visually.
+    const qrSize = cfg.qrSizePx; // 600 or 800
     const qrBox = document.getElementById('qr-container');
-    renderQrCode(qrBox, shelfID);
+
+    // Set the container's size to match the QR canvas size (in pixels) to avoid scaling
+    // But we need to respect the preview's max-width; we'll just let the container be as wide as it wants.
+    // We set the canvas size directly via the QR generator, and the container will wrap it.
+    renderQrCode(qrBox, shelfID, qrSize);
+
+    // Now force the container to size itself to the canvas (no extra padding)
+    // We'll add a CSS rule for this later.
 
     setPageSize(size);
-
     showScreen('preview');
     console.log('👀 Preview screen should be visible now');
 });
@@ -346,8 +341,8 @@ document.getElementById('btn-download').addEventListener('click', () => {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, widthPx, heightPx);
 
-    const qrScale = isLetter ? 0.35 : 0.6;
-    const qrSize = Math.min(widthPx, heightPx) * qrScale;
+    // Use the actual QR canvas (which is already high-res)
+    const qrSize = Math.min(widthPx, heightPx) * (isLetter ? 0.35 : 0.6);
     const qrX = (widthPx - qrSize) / 2;
     const qrY = (heightPx - qrSize) / 2 - (is4x6 || isLetter ? 50 : 0);
     ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
