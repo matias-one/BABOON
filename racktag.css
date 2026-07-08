@@ -368,3 +368,11 @@ body {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
 }
+
+/* Clear All button - danger style */
+#btn-clear-all:hover {
+    background: #e74c3c !important;
+    color: white !important;
+    border-color: #e74c3c !important;
+    transition: 0.2s ease;
+}

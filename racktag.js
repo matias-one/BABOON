@@ -218,6 +218,8 @@ document.getElementById('label-size').addEventListener('change', (e) => {
     console.log('📏 Label size changed to:', state.labelSize);
 });
 
+
+
 /* --------------------------------------------------
    GENERATE LABEL – FIXED QR CODE
 -------------------------------------------------- */
@@ -379,7 +381,34 @@ document.getElementById('btn-new').addEventListener('click', () => {
     showScreen('home');
 });
 
+/* --------------------------------------------------
+   CLEAR ALL FIELDS
+-------------------------------------------------- */
+
+document.getElementById('btn-clear-all').addEventListener('click', () => {
+    // Reset the state object
+    state.warehouse = '';
+    state.floor = '';
+    state.section = '';
+    state.subsection = '';
+    
+    // Save the empty state to localStorage
+    saveState();
+    
+    // Update the home screen buttons to show "(Clear)"
+    document.getElementById('sel-warehouse').innerText = '(Clear)';
+    document.getElementById('sel-floor').innerText = '(Clear)';
+    document.getElementById('sel-section').innerText = '(Clear)';
+    document.getElementById('sel-subsection').innerText = '(Clear)';
+    
+    // Disable the GENERATE LABEL button
+    updateGenerateButton();
+    
+    console.log('🧹 Cleared all fields. Ready for a new label.');
+});
+
 document.getElementById('btn-reprint').addEventListener('click', () => {
     setPageSize(state.labelSize);
     window.print();
 });
+
